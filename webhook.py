@@ -5,7 +5,7 @@ import os
 app = Flask(__name__)
 
 PHONE_NUMBER_ID = "1128696106998921"
-ACCESS_TOKEN = "EAAZC2SNriB8cBRgqm2aKERjWUBDpaFZCPcJlbBZBTRHI0y0IOApXAb6GnAUeIsQsxEPa152vEOC5EeGoTvhc7aqQvXYJOucWZCZCBqXVEiIhE2E465RNrWOj4TQk0iidojWY5vwfCxF7xNWloJGH0IY0AbJfGZAYXZCwfvGN7vvI5WmCQH2nYKQ5wZCJq7sSdYCZAFZAn2HhWiFh3epdjhLg03bCLl9piRXCOJN0VrAZBiBkN2VBxyMrP7ZCAgRTjsx1Sd7vGCs4wMeO3qkijJVdR5Le"
+ACCESS_TOKEN = "EAAZC2SNriB8cBRid7toKmcikVthx4xmZBFRbnllAZCYavPc0qhYXsVT4BbNstHvMfVs0zmATlHTYibUh8ZBeJDpzLjK0yKhP67Q6YvPh5aRQ83wkyrkxDiGB6qtd1aCRawTiXmrpYXQKN3yD5MWhkzRg0NIyVoGS9vkFZBXUGAoFNIjCJwAOLZC7SePZCXNZByUZCuiZAGcrRW1t9zVMqPYZAFtZBivEENwnalVmjpLshKDezEi7ZCZC2crvWsbSaCxY9U2PKm2mbeelxtZA0Mqyia2pK3q"
 VERIFY_TOKEN = "mi_token_secreto"
 
 def enviar_mensaje(destinatario, mensaje):
@@ -20,7 +20,8 @@ def enviar_mensaje(destinatario, mensaje):
         "type": "text",
         "text": {"body": mensaje}
     }
-    requests.post(url, headers=headers, json=data)
+    response = requests.post(url, headers=headers, json=data)
+    print("Respuesta envío:", response.json())
 
 @app.route("/webhook", methods=["GET"])
 def verificar_webhook():
@@ -34,11 +35,13 @@ def verificar_webhook():
 @app.route("/webhook", methods=["POST"])
 def recibir_mensaje():
     data = request.get_json()
+    print("Datos recibidos:", data)
     try:
         mensajes = data["entry"][0]["changes"][0]["value"]["messages"]
         for mensaje in mensajes:
             numero = mensaje["from"]
             texto = mensaje["text"]["body"].lower()
+            print(f"Mensaje de {numero}: {texto}")
 
             if "hola" in texto:
                 respuesta = "¡Hola! ¿En qué te puedo ayudar? 😊"
