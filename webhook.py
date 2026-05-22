@@ -14,7 +14,7 @@ Responde de forma amable, clara y concisa en español.
 Si no sabes algo, di que un asesor humano le contactará pronto."""
 
 def preguntar_gemini(mensaje):
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key={GEMINI_API_KEY}"
     headers = {"Content-Type": "application/json"}
     data = {
         "contents": [
