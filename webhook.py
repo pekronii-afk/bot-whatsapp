@@ -26,9 +26,16 @@ def preguntar_gemini(mensaje):
         ]
     }
     response = requests.post(url, headers=headers, json=data)
-    print("Respuesta Gemini:", response.json())
     result = response.json()
-    return result["candidates"][0]["content"]["parts"][0]["text"]
+    print("Respuesta completa Gemini:", result)
+    if "candidates" in result:
+        return result["candidates"][0]["content"]["parts"][0]["text"]
+    elif "error" in result:
+        print("Error Gemini:", result["error"])
+        return "Lo siento, no pude procesar tu mensaje. Un asesor te contactará pronto."
+    else:
+        print("Respuesta inesperada:", result)
+        return "Lo siento, no pude procesar tu mensaje. Un asesor te contactará pronto."
 
 def enviar_mensaje(destinatario, mensaje):
     url = f"https://graph.facebook.com/v25.0/{PHONE_NUMBER_ID}/messages"
@@ -57,7 +64,6 @@ def verificar_webhook():
 @app.route("/webhook", methods=["POST"])
 def recibir_mensaje():
     data = request.get_json()
-    print("Datos recibidos:", data)
     try:
         mensajes = data["entry"][0]["changes"][0]["value"]["messages"]
         for mensaje in mensajes:
