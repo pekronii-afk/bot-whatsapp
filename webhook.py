@@ -14,7 +14,7 @@ Responde de forma amable, clara y concisa en español.
 Si no sabes algo, di que un asesor humano le contactará pronto."""
 
 def preguntar_gemini(mensaje):
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
     headers = {"Content-Type": "application/json"}
     data = {
         "contents": [
@@ -26,6 +26,7 @@ def preguntar_gemini(mensaje):
         ]
     }
     response = requests.post(url, headers=headers, json=data)
+    print("Respuesta Gemini:", response.json())
     result = response.json()
     return result["candidates"][0]["content"]["parts"][0]["text"]
 
@@ -63,7 +64,6 @@ def recibir_mensaje():
             numero = mensaje["from"]
             texto = mensaje["text"]["body"]
             print(f"Mensaje de {numero}: {texto}")
-
             respuesta = preguntar_gemini(texto)
             enviar_mensaje(numero, respuesta)
     except Exception as e:
