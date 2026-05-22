@@ -7,6 +7,27 @@ app = Flask(__name__)
 PHONE_NUMBER_ID = "1128696106998921"
 ACCESS_TOKEN = "EAAZC2SNriB8cBRid7toKmcikVthx4xmZBFRbnllAZCYavPc0qhYXsVT4BbNstHvMfVs0zmATlHTYibUh8ZBeJDpzLjK0yKhP67Q6YvPh5aRQ83wkyrkxDiGB6qtd1aCRawTiXmrpYXQKN3yD5MWhkzRg0NIyVoGS9vkFZBXUGAoFNIjCJwAOLZC7SePZCXNZByUZCuiZAGcrRW1t9zVMqPYZAFtZBivEENwnalVmjpLshKDezEi7ZCZC2crvWsbSaCxY9U2PKm2mbeelxtZA0Mqyia2pK3q"
 VERIFY_TOKEN = "mi_token_secreto"
+GEMINI_API_KEY = "AIzaSyB1UqlJKFO4z6QAq854_TLxeFdOvUsrFQ8"
+
+SISTEMA = """Eres un asistente virtual de atención al cliente. 
+Responde de forma amable, clara y concisa en español.
+Si no sabes algo, di que un asesor humano le contactará pronto."""
+
+def preguntar_gemini(mensaje):
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"
+    headers = {"Content-Type": "application/json"}
+    data = {
+        "contents": [
+            {
+                "parts": [
+                    {"text": f"{SISTEMA}\n\nCliente: {mensaje}"}
+                ]
+            }
+        ]
+    }
+    response = requests.post(url, headers=headers, json=data)
+    result = response.json()
+    return result["candidates"][0]["content"]["parts"][0]["text"]
 
 def enviar_mensaje(destinatario, mensaje):
     url = f"https://graph.facebook.com/v25.0/{PHONE_NUMBER_ID}/messages"
@@ -40,18 +61,10 @@ def recibir_mensaje():
         mensajes = data["entry"][0]["changes"][0]["value"]["messages"]
         for mensaje in mensajes:
             numero = mensaje["from"]
-            texto = mensaje["text"]["body"].lower()
+            texto = mensaje["text"]["body"]
             print(f"Mensaje de {numero}: {texto}")
 
-            if "hola" in texto:
-                respuesta = "¡Hola! ¿En qué te puedo ayudar? 😊"
-            elif "precio" in texto:
-                respuesta = "Nuestros precios van desde $100 hasta $500. ¿Quieres más información?"
-            elif "horario" in texto:
-                respuesta = "Atendemos de lunes a viernes de 9am a 6pm."
-            else:
-                respuesta = "Gracias por tu mensaje. En breve te atendemos."
-
+            respuesta = preguntar_gemini(texto)
             enviar_mensaje(numero, respuesta)
     except Exception as e:
         print("Error:", e)
